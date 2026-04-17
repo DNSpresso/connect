@@ -1,0 +1,63 @@
+{
+  "name": "@dnspresso/connect",
+  "version": "0.0.0",
+  "description": "TypeScript SDK for managing DNS records across providers.",
+  "keywords": [
+    "dns",
+    "dns-records",
+    "domain",
+    "sdk",
+    "typescript"
+  ],
+  "homepage": "https://github.com/DNSpresso/connect#readme",
+  "bugs": {
+    "url": "https://github.com/DNSpresso/connect/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DNSpresso/connect.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "prepack": "pnpm run build",
+    "clean": "node --eval \"const { rmSync } = require('node:fs'); for (const path of ['dist', 'coverage']) rmSync(path, { recursive: true, force: true });\"",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint src tsup.config.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test"
+  },
+  "devDependencies": {
+    "@types/node": "25.6.0",
+    "oxfmt": "0.44.0",
+    "oxlint": "1.59.0",
+    "tsup": "8.5.1",
+    "typescript": "6.0.2",
+    "vitest": "4.1.4"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@10.33.0"
+}
