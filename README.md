@@ -20,7 +20,6 @@ The SDK is designed for products that need users to complete manual DNS setup fo
 
 Provider data lives in `src/data/provider-data.json`
 
-
 ## Installation
 
 ```bash

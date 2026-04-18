@@ -7,19 +7,8 @@ export { createSetupGuidance } from "./guide/create-guidance";
 export { watchPropagation } from "./watch/watch-propagation";
 
 export type { ConnectErrorCode } from "./connect-error";
-export type {
-  DnsRecord,
-  DnsRecordType,
-  Hostname,
-  Ipv4Address,
-  Ipv6Address,
-} from "./dns-record";
-export type {
-  DnsAnswer,
-  DnsQueryResult,
-  DnsQueryTransport,
-  DnsQueryType,
-} from "./dns-transport";
+export type { DnsRecord, DnsRecordType, Hostname, Ipv4Address, Ipv6Address } from "./dns-record";
+export type { DnsAnswer, DnsQueryResult, DnsQueryTransport, DnsQueryType } from "./dns-transport";
 export type { DomainName, ParseDomainNameResult } from "./domain-name";
 export type { DetectProviderResult } from "./detect/detect-provider";
 export type { DnsRecordInstruction, SetupGuidance } from "./guide/create-guidance";
