@@ -1,0 +1,36 @@
+{
+  "cloudflare": {
+    "name": "Cloudflare",
+    "nameserverPatterns": ["*.ns.cloudflare.com"],
+    "dnsSettingsUrl": "https://dash.cloudflare.com/",
+    "notes": [
+      "Disable Cloudflare proxy (orange cloud) for CNAME records used in domain verification."
+    ]
+  },
+  "godaddy": {
+    "name": "GoDaddy",
+    "nameserverPatterns": ["*.domaincontrol.com"],
+    "dnsSettingsUrl": "https://dcc.godaddy.com/manage/dns"
+  },
+  "namecheap": {
+    "name": "Namecheap",
+    "nameserverPatterns": ["*.registrar-servers.com"],
+    "dnsSettingsUrl": "https://ap.www.namecheap.com/Domains/DomainControlPanel/",
+    "notes": ["Use '@' for the root domain in the Host field."]
+  },
+  "route53": {
+    "name": "Amazon Route 53",
+    "nameserverPatterns": [
+      "*.awsdns-*.com",
+      "*.awsdns-*.net",
+      "*.awsdns-*.co.uk",
+      "*.awsdns-*.org"
+    ],
+    "dnsSettingsUrl": "https://console.aws.amazon.com/route53/"
+  },
+  "porkbun": {
+    "name": "Porkbun",
+    "nameserverPatterns": ["*.ns.porkbun.com"],
+    "dnsSettingsUrl": "https://porkbun.com/account/domains"
+  }
+}
