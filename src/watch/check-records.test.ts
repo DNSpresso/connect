@@ -160,6 +160,28 @@ describe("evaluateRecordChecks", () => {
     expect(status).toBe("propagated");
   });
 
+  it("returns propagated when all reachable resolvers match", () => {
+    const status = evaluateRecordChecks({
+      expected: [record],
+      results: [
+        {
+          record,
+          resolver: "resolver-1",
+          status: "found",
+          actualValues: ["verification=token"],
+        },
+        {
+          record,
+          resolver: "resolver-2",
+          status: "error",
+          actualValues: [],
+        },
+      ],
+    });
+
+    expect(status).toBe("propagated");
+  });
+
   it("returns pending when successful lookups find no matches", () => {
     const status = evaluateRecordChecks({
       expected: [record],

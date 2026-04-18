@@ -92,7 +92,7 @@ function evaluateRecordChecks(options: {
   const foundResults = options.results.filter(
     (result) => result.status === 'found',
   );
-  if (foundResults.length === options.results.length) {
+  if (foundResults.length > 0 && foundResults.length === nonErrorResults.length) {
     return 'propagated';
   }
 
