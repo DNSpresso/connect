@@ -119,6 +119,7 @@ describe("evaluateRecordChecks", () => {
   it("returns partially-propagated when some results match", () => {
     const status = evaluateRecordChecks({
       expected: [record],
+      expectedResultCount: 2,
       results: [
         {
           record,
@@ -141,6 +142,7 @@ describe("evaluateRecordChecks", () => {
   it("returns propagated when every check matches", () => {
     const status = evaluateRecordChecks({
       expected: [record],
+      expectedResultCount: 2,
       results: [
         {
           record,
@@ -163,6 +165,7 @@ describe("evaluateRecordChecks", () => {
   it("returns propagated when all reachable resolvers match", () => {
     const status = evaluateRecordChecks({
       expected: [record],
+      expectedResultCount: 2,
       results: [
         {
           record,
@@ -185,6 +188,7 @@ describe("evaluateRecordChecks", () => {
   it("returns pending when successful lookups find no matches", () => {
     const status = evaluateRecordChecks({
       expected: [record],
+      expectedResultCount: 2,
       results: [
         {
           record,
@@ -220,6 +224,7 @@ describe("evaluateRecordChecks", () => {
 
     const status = evaluateRecordChecks({
       expected: [record],
+      expectedResultCount: 2,
       results: [firstCheck.check, secondCheck.check],
     });
 

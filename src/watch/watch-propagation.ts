@@ -175,6 +175,7 @@ async function* watchPropagation(options: {
     const elapsed = Date.now() - startedAt;
     const aggregateStatus = evaluateRecordChecks({
       expected: options.records,
+      expectedResultCount: options.records.length * resolvers.length,
       results: pollPass.checks,
     });
 

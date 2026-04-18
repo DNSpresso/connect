@@ -76,6 +76,7 @@ function createRecordCheck(options: {
 
 function evaluateRecordChecks(options: {
   expected: readonly DnsRecord[];
+  expectedResultCount: number;
   results: readonly RecordCheck[];
 }): 'propagated' | 'partially-propagated' | 'pending' | 'error' {
   if (options.expected.length === 0) {
@@ -92,7 +93,11 @@ function evaluateRecordChecks(options: {
   const foundResults = options.results.filter(
     (result) => result.status === 'found',
   );
-  if (foundResults.length > 0 && foundResults.length === nonErrorResults.length) {
+  if (
+    options.results.length === options.expectedResultCount &&
+    foundResults.length > 0 &&
+    foundResults.length === nonErrorResults.length
+  ) {
     return 'propagated';
   }
 
