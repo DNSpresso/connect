@@ -256,6 +256,41 @@ describe("watchPropagation", () => {
     }
   });
 
+  it("yields timed-out instead of error when timeout is already reached", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+
+    try {
+      const transport = createSequenceTransport({
+        responses: [
+          {
+            status: "error",
+            error: new ConnectError("DNS_LOOKUP_FAILED", "resolver 1 failed"),
+          },
+          {
+            status: "error",
+            error: new ConnectError("DNS_LOOKUP_FAILED", "resolver 2 failed"),
+          },
+        ],
+      });
+
+      const iterator = watchPropagation({
+        domain,
+        records: [txtRecord],
+        transport,
+        timeout: 0,
+      });
+
+      const first = await iterator.next();
+      const second = await iterator.next();
+
+      expect(first.value).toMatchObject({ status: "timed-out" });
+      expect(second.done).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("returns cleanly when aborted mid-poll", async () => {
     const controller = new AbortController();
     const transport: DnsQueryTransport = ({ signal }) =>

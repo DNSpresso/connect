@@ -179,6 +179,15 @@ async function* watchPropagation(options: {
     });
 
     if (aggregateStatus === "error") {
+      if (elapsed >= timeout) {
+        yield {
+          status: "timed-out",
+          checks: pollPass.checks,
+          elapsed,
+        };
+        return;
+      }
+
       yield {
         status: "error",
         error: pollPass.error ?? new ConnectError("DNS_LOOKUP_FAILED", "DNS lookup failed"),
