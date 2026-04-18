@@ -16,6 +16,11 @@ type NameserverMatch = {
   readonly matchedPattern: string;
 };
 
+type ResolvedProviderMatches = {
+  readonly primaryMatch: ProviderMatch;
+  readonly nameserverMatches: readonly NameserverMatch[];
+};
+
 function getGlobRegex(options: { pattern: string }): RegExp {
   const cached = globRegexCache.get(options.pattern);
   if (cached !== undefined) {
@@ -84,9 +89,29 @@ function collectNameserverMatches(options: {
   }));
 }
 
-function matchProvider(options: { nameservers: readonly string[] }): ProviderMatch | undefined {
-  return collectProviderMatches(options)[0];
+function resolveProviderMatches(options: {
+  nameservers: readonly string[];
+}): ResolvedProviderMatches | undefined {
+  const providerMatches = collectProviderMatches(options);
+  const primaryMatch = providerMatches[0];
+
+  if (primaryMatch === undefined) {
+    return undefined;
+  }
+
+  return {
+    primaryMatch,
+    nameserverMatches: providerMatches.map((match) => ({
+      nameserver: match.matchedNameserver,
+      providerId: match.providerId,
+      matchedPattern: match.matchedPattern,
+    })),
+  };
 }
 
-export { collectNameserverMatches, matchProvider };
-export type { NameserverMatch, ProviderMatch };
+function matchProvider(options: { nameservers: readonly string[] }): ProviderMatch | undefined {
+  return resolveProviderMatches(options)?.primaryMatch;
+}
+
+export { collectNameserverMatches, matchProvider, resolveProviderMatches };
+export type { NameserverMatch, ProviderMatch, ResolvedProviderMatches };

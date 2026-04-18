@@ -94,6 +94,45 @@ describe("detectProvider", () => {
     });
   });
 
+  it("returns high confidence for duplicate agreeing nameserver answers", async () => {
+    const transport = createMockTransport({
+      result: {
+        status: "success",
+        answers: [
+          { name: "example.com", type: 2, ttl: 300, data: "adam.ns.cloudflare.com" },
+          { name: "example.com", type: 2, ttl: 300, data: "adam.ns.cloudflare.com" },
+        ],
+      },
+    });
+
+    const result = await detectProvider({
+      domain: "example.com",
+      transport,
+    });
+
+    expect(result).toMatchObject({
+      status: "detected",
+      providerId: "cloudflare",
+      detectionMethod: "nameserver-pattern",
+      confidence: "high",
+      evidence: {
+        nameservers: ["adam.ns.cloudflare.com", "adam.ns.cloudflare.com"],
+        matches: [
+          {
+            nameserver: "adam.ns.cloudflare.com",
+            providerId: "cloudflare",
+            matchedPattern: "*.ns.cloudflare.com",
+          },
+          {
+            nameserver: "adam.ns.cloudflare.com",
+            providerId: "cloudflare",
+            matchedPattern: "*.ns.cloudflare.com",
+          },
+        ],
+      },
+    });
+  });
+
   it("returns unknown-provider for unmatched nameservers", async () => {
     const transport = createMockTransport({
       result: {

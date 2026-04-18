@@ -46,8 +46,8 @@ describe("createSetupGuidance", () => {
         name: "Cloudflare",
         capabilities: {
           manual: true,
-          domainConnect: "unsupported",
-          providerApi: "supported",
+          domainConnect: "unknown",
+          providerApi: "unknown",
         },
         detectionMethod: "nameserver-pattern",
         confidence: "medium",

@@ -8,8 +8,8 @@
     },
     "capabilities": {
       "manual": true,
-      "domainConnect": "unsupported",
-      "providerApi": "supported"
+      "domainConnect": "unknown",
+      "providerApi": "unknown"
     },
     "notes": [
       "Disable Cloudflare proxy (orange cloud) for CNAME records used in domain verification."
@@ -24,7 +24,7 @@
     },
     "capabilities": {
       "manual": true,
-      "domainConnect": "supported",
+      "domainConnect": "unknown",
       "providerApi": "unknown"
     }
   },
@@ -56,8 +56,8 @@
     },
     "capabilities": {
       "manual": true,
-      "domainConnect": "unsupported",
-      "providerApi": "supported"
+      "domainConnect": "unknown",
+      "providerApi": "unknown"
     }
   },
   "porkbun": {

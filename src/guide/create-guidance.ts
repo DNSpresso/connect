@@ -65,10 +65,6 @@ function createRecordInstruction(options: {
   };
 }
 
-function resolveDnsSettingsUrl(options: { baseUrl?: string | undefined }): string | undefined {
-  return options.baseUrl;
-}
-
 function createSetupGuidance(options: {
   detection: DetectProviderResult;
   records: readonly DnsRecord[];
@@ -95,9 +91,7 @@ function createSetupGuidance(options: {
       },
       records,
       links: {
-        dnsSettings: resolveDnsSettingsUrl({
-          baseUrl: options.detection.provider.dnsSettings?.baseUrl,
-        }),
+        dnsSettings: options.detection.provider.dnsSettings?.baseUrl,
       },
       notes,
     };

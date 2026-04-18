@@ -65,8 +65,8 @@ describe("matchProvider", () => {
 
     expect(result?.provider.capabilities).toEqual({
       manual: true,
-      domainConnect: "unsupported",
-      providerApi: "supported",
+      domainConnect: "unknown",
+      providerApi: "unknown",
     });
   });
 });

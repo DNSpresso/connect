@@ -2,11 +2,7 @@ import { ConnectError } from "../connect-error";
 import { normalizeDnsHostname } from "../dns-normalize";
 import { createDohTransport, type DnsQueryTransport } from "../dns-transport";
 import { assertDomainName } from "../domain-name";
-import {
-  collectNameserverMatches,
-  matchProvider,
-  type NameserverMatch,
-} from "../providers/provider-match";
+import { resolveProviderMatches, type NameserverMatch } from "../providers/provider-match";
 import { type ProviderDefinition, type ProviderId } from "../providers/provider-registry";
 
 type DetectProviderMethod = "nameserver-pattern" | "domain-connect";
@@ -55,7 +51,7 @@ function getDetectionConfidence(options: {
   });
 
   if (
-    uniqueNameservers.length > 1 &&
+    options.nameservers.length > 1 &&
     everyNameserverMatchesOnlyDetectedProvider &&
     !hasConflictingProviderMatches
   ) {
@@ -96,31 +92,29 @@ async function detectProvider(options: {
   const nameservers = lookupResult.answers.map((answer) =>
     normalizeDnsHostname({ value: answer.data }),
   );
-  const primaryMatch = matchProvider({ nameservers });
+  const resolvedProviderMatches = resolveProviderMatches({ nameservers });
 
-  if (primaryMatch === undefined) {
+  if (resolvedProviderMatches === undefined) {
     return {
       status: "unknown-provider",
       nameservers,
     };
   }
 
-  const matches = collectNameserverMatches({ nameservers });
-
   return {
     status: "detected",
-    providerId: primaryMatch.providerId,
-    provider: primaryMatch.provider,
+    providerId: resolvedProviderMatches.primaryMatch.providerId,
+    provider: resolvedProviderMatches.primaryMatch.provider,
     nameservers,
     detectionMethod: "nameserver-pattern",
     confidence: getDetectionConfidence({
       nameservers,
-      providerId: primaryMatch.providerId,
-      matches,
+      providerId: resolvedProviderMatches.primaryMatch.providerId,
+      matches: resolvedProviderMatches.nameserverMatches,
     }),
     evidence: {
       nameservers,
-      matches,
+      matches: resolvedProviderMatches.nameserverMatches,
     },
   };
 }
