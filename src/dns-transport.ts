@@ -1,5 +1,4 @@
 import { ConnectError } from './connect-error';
-import { normalizeTxtValue } from './dns-normalize';
 import { type DnsRecordType } from './dns-record';
 
 type DnsQueryType = DnsRecordType | 'NS';
@@ -45,10 +44,7 @@ function mapAnswers(options: {
     name: answer.name,
     type: answer.type,
     ttl: answer.TTL,
-    data:
-      answer.type === 16
-        ? normalizeTxtValue({ value: answer.data })
-        : answer.data,
+    data: answer.data,
   }));
 }
 
