@@ -110,7 +110,7 @@ function resolveProviderMatches(options: {
 }
 
 function matchProvider(options: { nameservers: readonly string[] }): ProviderMatch | undefined {
-  return resolveProviderMatches(options)?.primaryMatch;
+  return collectProviderMatches(options)[0];
 }
 
 export { collectNameserverMatches, matchProvider, resolveProviderMatches };
