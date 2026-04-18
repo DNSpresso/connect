@@ -7,7 +7,7 @@ const providerCapabilitySupportSchema = z.enum(PROVIDER_CAPABILITY_SUPPORT);
 const PROVIDER_DEEP_LINK_STRATEGIES = ["none", "domain-path", "zone-id"] as const;
 const providerDeepLinkStrategySchema = z.enum(PROVIDER_DEEP_LINK_STRATEGIES);
 const providerDnsSettingsSchema = z.object({
-  baseUrl: z.string().url(),
+  baseUrl: z.url(),
   deepLinkStrategy: providerDeepLinkStrategySchema,
 });
 const providerCapabilitiesSchema = z.object({

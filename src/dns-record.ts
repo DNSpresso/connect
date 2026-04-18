@@ -77,7 +77,9 @@ function assertValidTtl(options: { ttl?: number | undefined }): void {
 
   const result = ttlSchema.safeParse(ttl);
   if (!result.success) {
-    throw createInvalidDnsRecordError({ reason: `Invalid DNS record TTL: ${ttl}` });
+    throw createInvalidDnsRecordError({
+      reason: `Invalid DNS record TTL: ${ttl}`,
+    });
   }
 }
 
