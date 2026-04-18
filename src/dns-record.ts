@@ -134,8 +134,7 @@ function parseRecordName(options: { value: string }): DomainName | undefined {
 
   const isValidRecordName = labels.every(
     (label) =>
-      isValidHostnameLabel({ value: label }) ||
-      isValidUnderscoreRecordLabel({ value: label }),
+      isValidHostnameLabel({ value: label }) || isValidUnderscoreRecordLabel({ value: label }),
   );
   if (!isValidRecordName) {
     return undefined;

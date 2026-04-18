@@ -61,9 +61,7 @@ function createSetupGuidance(options: {
   domain: string;
 }): SetupGuidance {
   const domain = assertDomainName({ value: options.domain });
-  const records = options.records.map((record) =>
-    createRecordInstruction({ record, domain }),
-  );
+  const records = options.records.map((record) => createRecordInstruction({ record, domain }));
   const notes = [...DEFAULT_NOTES];
 
   if (options.detection.status === "detected") {

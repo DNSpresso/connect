@@ -1,7 +1,7 @@
-import { ConnectError } from './connect-error';
-import { type DnsRecordType } from './dns-record';
+import { ConnectError } from "./connect-error";
+import { type DnsRecordType } from "./dns-record";
 
-type DnsQueryType = DnsRecordType | 'NS';
+type DnsQueryType = DnsRecordType | "NS";
 
 type DnsAnswer = {
   readonly name: string;
@@ -11,8 +11,8 @@ type DnsAnswer = {
 };
 
 type DnsQueryResult =
-  | { readonly status: 'success'; readonly answers: readonly DnsAnswer[] }
-  | { readonly status: 'error'; readonly error: ConnectError };
+  | { readonly status: "success"; readonly answers: readonly DnsAnswer[] }
+  | { readonly status: "error"; readonly error: ConnectError };
 
 type DnsQueryTransport = (options: {
   name: string;
@@ -33,9 +33,7 @@ type DohJsonResponse = {
   readonly Answer?: readonly DohAnswer[];
 };
 
-function mapAnswers(options: {
-  response: DohJsonResponse;
-}): readonly DnsAnswer[] {
+function mapAnswers(options: { response: DohJsonResponse }): readonly DnsAnswer[] {
   if (options.response.Status !== 0) {
     return [];
   }
@@ -48,20 +46,17 @@ function mapAnswers(options: {
   }));
 }
 
-function createDohTransport(options?: {
-  defaultResolver?: string;
-}): DnsQueryTransport {
-  const defaultResolver =
-    options?.defaultResolver ?? 'https://cloudflare-dns.com/dns-query';
+function createDohTransport(options?: { defaultResolver?: string }): DnsQueryTransport {
+  const defaultResolver = options?.defaultResolver ?? "https://cloudflare-dns.com/dns-query";
 
   return async ({ name, type, resolver, signal }) => {
     const url = new URL(resolver ?? defaultResolver);
-    url.searchParams.set('name', name);
-    url.searchParams.set('type', type);
+    url.searchParams.set("name", name);
+    url.searchParams.set("type", type);
 
     try {
       const requestInit: RequestInit = {
-        headers: { Accept: 'application/dns-json' },
+        headers: { Accept: "application/dns-json" },
       };
       if (signal !== undefined) {
         requestInit.signal = signal;
@@ -70,20 +65,17 @@ function createDohTransport(options?: {
       const response = await fetch(url, requestInit);
       if (!response.ok) {
         return {
-          status: 'error',
-          error: new ConnectError(
-            'DNS_LOOKUP_FAILED',
-            `DoH ${response.status}`,
-          ),
+          status: "error",
+          error: new ConnectError("DNS_LOOKUP_FAILED", `DoH ${response.status}`),
         };
       }
 
       const json = (await response.json()) as DohJsonResponse;
-      return { status: 'success', answers: mapAnswers({ response: json }) };
+      return { status: "success", answers: mapAnswers({ response: json }) };
     } catch (error) {
       return {
-        status: 'error',
-        error: new ConnectError('DNS_LOOKUP_FAILED', 'DNS query failed', {
+        status: "error",
+        error: new ConnectError("DNS_LOOKUP_FAILED", "DNS query failed", {
           cause: error,
         }),
       };

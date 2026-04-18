@@ -1,9 +1,5 @@
 import { normalizeDnsHostname } from "../dns-normalize";
-import {
-  PROVIDER_REGISTRY,
-  type ProviderDefinition,
-  type ProviderId,
-} from "./provider-registry";
+import { PROVIDER_REGISTRY, type ProviderDefinition, type ProviderId } from "./provider-registry";
 
 const globRegexCache = new Map<string, RegExp>();
 

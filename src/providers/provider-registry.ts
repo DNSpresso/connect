@@ -28,17 +28,14 @@ function toReadonlyProviderDefinition(options: {
     nameserverPatterns: Object.freeze([...options.provider.nameserverPatterns]),
     dnsSettingsUrl: options.provider.dnsSettingsUrl,
     notes:
-      options.provider.notes === undefined
-        ? undefined
-        : Object.freeze([...options.provider.notes]),
+      options.provider.notes === undefined ? undefined : Object.freeze([...options.provider.notes]),
   });
 }
 
 const parsedProviderRegistry = providerRegistrySchema.parse(rawProviderRegistry);
-const providerRegistryEntries = Object.entries(parsedProviderRegistry).map(([providerId, provider]) => [
-  providerId,
-  toReadonlyProviderDefinition({ provider }),
-]);
+const providerRegistryEntries = Object.entries(parsedProviderRegistry).map(
+  ([providerId, provider]) => [providerId, toReadonlyProviderDefinition({ provider })],
+);
 
 const PROVIDER_REGISTRY = Object.freeze(
   Object.fromEntries(providerRegistryEntries),

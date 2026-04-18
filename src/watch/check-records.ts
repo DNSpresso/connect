@@ -1,9 +1,9 @@
-import { type ConnectError } from '../connect-error';
-import { normalizeDnsHostname, normalizeTxtValue } from '../dns-normalize';
-import { type DnsQueryResult } from '../dns-transport';
-import { normalizeIpv6Address, type DnsRecord } from '../dns-record';
+import { type ConnectError } from "../connect-error";
+import { normalizeDnsHostname, normalizeTxtValue } from "../dns-normalize";
+import { type DnsQueryResult } from "../dns-transport";
+import { normalizeIpv6Address, type DnsRecord } from "../dns-record";
 
-type RecordCheckStatus = 'found' | 'not-found' | 'error';
+type RecordCheckStatus = "found" | "not-found" | "error";
 
 type RecordCheck = {
   readonly record: DnsRecord;
@@ -17,23 +17,17 @@ type RecordCheckResult = {
   readonly error?: ConnectError;
 };
 
-function normalizeRecordValue(options: {
-  record: DnsRecord;
-  value: string;
-}): string {
-  if (options.record.type === 'CNAME') {
+function normalizeRecordValue(options: { record: DnsRecord; value: string }): string {
+  if (options.record.type === "CNAME") {
     return normalizeDnsHostname({ value: options.value });
   }
 
-  if (options.record.type === 'TXT') {
+  if (options.record.type === "TXT") {
     return normalizeTxtValue({ value: options.value });
   }
 
-  if (options.record.type === 'AAAA') {
-    return (
-      normalizeIpv6Address({ value: options.value }) ??
-      options.value.toLowerCase()
-    );
+  if (options.record.type === "AAAA") {
+    return normalizeIpv6Address({ value: options.value }) ?? options.value.toLowerCase();
   }
 
   return options.value;
@@ -44,12 +38,12 @@ function createRecordCheck(options: {
   resolver: string;
   result: DnsQueryResult;
 }): RecordCheckResult {
-  if (options.result.status === 'error') {
+  if (options.result.status === "error") {
     return {
       check: {
         record: options.record,
         resolver: options.resolver,
-        status: 'error',
+        status: "error",
         actualValues: [],
       },
       error: options.result.error,
@@ -68,7 +62,7 @@ function createRecordCheck(options: {
     check: {
       record: options.record,
       resolver: options.resolver,
-      status: actualValues.includes(expectedValue) ? 'found' : 'not-found',
+      status: actualValues.includes(expectedValue) ? "found" : "not-found",
       actualValues,
     },
   };
@@ -78,21 +72,17 @@ function evaluateRecordChecks(options: {
   expected: readonly DnsRecord[];
   expectedResultCount: number;
   results: readonly RecordCheck[];
-}): 'propagated' | 'partially-propagated' | 'pending' | 'error' {
+}): "propagated" | "partially-propagated" | "pending" | "error" {
   if (options.expected.length === 0) {
-    return 'propagated';
+    return "propagated";
   }
 
-  const nonErrorResults = options.results.filter(
-    (result) => result.status !== 'error',
-  );
+  const nonErrorResults = options.results.filter((result) => result.status !== "error");
   if (nonErrorResults.length === 0) {
-    return 'error';
+    return "error";
   }
 
-  const foundResults = options.results.filter(
-    (result) => result.status === 'found',
-  );
+  const foundResults = options.results.filter((result) => result.status === "found");
   const allExpectedRecordsMatched = options.expected.every((expectedRecord) =>
     foundResults.some(
       (result) =>
@@ -106,14 +96,14 @@ function evaluateRecordChecks(options: {
     foundResults.length === nonErrorResults.length &&
     allExpectedRecordsMatched
   ) {
-    return 'propagated';
+    return "propagated";
   }
 
   if (foundResults.length > 0) {
-    return 'partially-propagated';
+    return "partially-propagated";
   }
 
-  return 'pending';
+  return "pending";
 }
 
 export { createRecordCheck, evaluateRecordChecks };
