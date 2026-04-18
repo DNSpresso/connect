@@ -83,6 +83,28 @@ describe("createDnsRecord", () => {
     });
   });
 
+  it("allows underscore-prefixed DNS record names", () => {
+    const dmarcRecord = createDnsRecord({
+      type: "TXT",
+      name: "_dmarc.example.com",
+      value: "v=DMARC1; p=none",
+    });
+    const acmeRecord = createDnsRecord({
+      type: "TXT",
+      name: "_acme-challenge.example.com",
+      value: "challenge-token",
+    });
+    const dkimRecord = createDnsRecord({
+      type: "TXT",
+      name: "selector._domainkey.example.com",
+      value: "dkim-token",
+    });
+
+    expect(dmarcRecord.name).toBe("_dmarc.example.com");
+    expect(acmeRecord.name).toBe("_acme-challenge.example.com");
+    expect(dkimRecord.name).toBe("selector._domainkey.example.com");
+  });
+
   it("rejects invalid IPv4 values", () => {
     expect(() => createDnsRecord({ type: "A", name: domain, value: "256.0.0.1" })).toThrowError(
       ConnectError,
@@ -101,6 +123,12 @@ describe("createDnsRecord", () => {
   it("rejects invalid CNAME values", () => {
     expect(() =>
       createDnsRecord({ type: "CNAME", name: subdomain, value: "bad target" }),
+    ).toThrowError(ConnectError);
+  });
+
+  it("rejects invalid DNS record names that use underscores incorrectly", () => {
+    expect(() =>
+      createDnsRecord({ type: "TXT", name: "exa_mple.com", value: "value" }),
     ).toThrowError(ConnectError);
   });
 

@@ -113,13 +113,35 @@ function parseHostname(options: { value: string }): Hostname | undefined {
   return `${result.domain}` as Hostname;
 }
 
+function isValidHostnameLabel(options: { value: string }): boolean {
+  return /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(options.value);
+}
+
+function isValidUnderscoreRecordLabel(options: { value: string }): boolean {
+  return /^_[a-z0-9-]{1,62}$/.test(options.value);
+}
+
 function parseRecordName(options: { value: string }): DomainName | undefined {
-  const result = parseDomainName({ value: options.value });
-  if (result.status === "invalid-domain") {
+  const normalized = options.value.toLowerCase().trim().replace(/\.$/, "");
+  if (normalized.length < 1 || normalized.length > 253) {
     return undefined;
   }
 
-  return result.domain;
+  const labels = normalized.split(".");
+  if (labels.length < 2) {
+    return undefined;
+  }
+
+  const isValidRecordName = labels.every(
+    (label) =>
+      isValidHostnameLabel({ value: label }) ||
+      isValidUnderscoreRecordLabel({ value: label }),
+  );
+  if (!isValidRecordName) {
+    return undefined;
+  }
+
+  return normalized as DomainName;
 }
 
 function createDnsRecord(options: CreateDnsRecordOptions): DnsRecord {
