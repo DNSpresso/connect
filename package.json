@@ -1,6 +1,6 @@
 {
   "name": "@dnspresso/connect",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "TypeScript SDK for managing DNS records across providers.",
   "keywords": [
     "dns",
