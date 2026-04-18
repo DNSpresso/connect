@@ -93,10 +93,18 @@ function evaluateRecordChecks(options: {
   const foundResults = options.results.filter(
     (result) => result.status === 'found',
   );
+  const allExpectedRecordsMatched = options.expected.every((expectedRecord) =>
+    foundResults.some(
+      (result) =>
+        result.record.type === expectedRecord.type &&
+        result.record.name === expectedRecord.name &&
+        result.record.value === expectedRecord.value,
+    ),
+  );
   if (
     options.results.length === options.expectedResultCount &&
-    foundResults.length > 0 &&
-    foundResults.length === nonErrorResults.length
+    foundResults.length === nonErrorResults.length &&
+    allExpectedRecordsMatched
   ) {
     return 'propagated';
   }

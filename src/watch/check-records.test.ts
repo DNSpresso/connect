@@ -185,6 +185,47 @@ describe("evaluateRecordChecks", () => {
     expect(status).toBe("propagated");
   });
 
+  it("does not return propagated when one record errors on all resolvers", () => {
+    const secondRecord = createDnsRecord({
+      type: "TXT",
+      name: "status.example.com",
+      value: "verification=secondary",
+    });
+
+    const status = evaluateRecordChecks({
+      expected: [record, secondRecord],
+      expectedResultCount: 4,
+      results: [
+        {
+          record,
+          resolver: "resolver-1",
+          status: "found",
+          actualValues: ["verification=token"],
+        },
+        {
+          record,
+          resolver: "resolver-2",
+          status: "found",
+          actualValues: ["verification=token"],
+        },
+        {
+          record: secondRecord,
+          resolver: "resolver-1",
+          status: "error",
+          actualValues: [],
+        },
+        {
+          record: secondRecord,
+          resolver: "resolver-2",
+          status: "error",
+          actualValues: [],
+        },
+      ],
+    });
+
+    expect(status).toBe("partially-propagated");
+  });
+
   it("returns pending when successful lookups find no matches", () => {
     const status = evaluateRecordChecks({
       expected: [record],
