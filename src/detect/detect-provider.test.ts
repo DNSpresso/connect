@@ -94,7 +94,7 @@ describe("detectProvider", () => {
     });
   });
 
-  it("returns high confidence for duplicate agreeing nameserver answers", async () => {
+  it("returns medium confidence for duplicate agreeing nameserver answers", async () => {
     const transport = createMockTransport({
       result: {
         status: "success",
@@ -114,7 +114,7 @@ describe("detectProvider", () => {
       status: "detected",
       providerId: "cloudflare",
       detectionMethod: "nameserver-pattern",
-      confidence: "high",
+      confidence: "medium",
       evidence: {
         nameservers: ["adam.ns.cloudflare.com", "adam.ns.cloudflare.com"],
         matches: [

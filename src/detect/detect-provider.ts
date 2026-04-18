@@ -51,7 +51,7 @@ function getDetectionConfidence(options: {
   });
 
   if (
-    options.nameservers.length > 1 &&
+    uniqueNameservers.length > 1 &&
     everyNameserverMatchesOnlyDetectedProvider &&
     !hasConflictingProviderMatches
   ) {
