@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { collectNameserverMatches, matchProvider } from "./provider-match";
+import { matchProvider, resolveProviderMatches } from "./provider-match";
 
 describe("matchProvider", () => {
   it("matches Cloudflare nameservers", () => {
@@ -71,13 +71,13 @@ describe("matchProvider", () => {
   });
 });
 
-describe("collectNameserverMatches", () => {
+describe("resolveProviderMatches", () => {
   it("collects all nameserver matches in nameserver order", () => {
-    const result = collectNameserverMatches({
+    const result = resolveProviderMatches({
       nameservers: ["ns1.custom-dns.example", "adam.ns.cloudflare.com", "ns-123.awsdns-45.org"],
     });
 
-    expect(result).toEqual([
+    expect(result?.nameserverMatches).toEqual([
       {
         nameserver: "adam.ns.cloudflare.com",
         providerId: "cloudflare",
@@ -91,18 +91,18 @@ describe("collectNameserverMatches", () => {
     ]);
   });
 
-  it("returns an empty array when no nameservers match", () => {
-    const result = collectNameserverMatches({ nameservers: ["ns1.custom-dns.example"] });
+  it("returns undefined when no nameservers match", () => {
+    const result = resolveProviderMatches({ nameservers: ["ns1.custom-dns.example"] });
 
-    expect(result).toEqual([]);
+    expect(result).toBeUndefined();
   });
 
   it("normalizes trailing dots and mixed case while collecting evidence", () => {
-    const result = collectNameserverMatches({
+    const result = resolveProviderMatches({
       nameservers: ["Adam.NS.Cloudflare.COM.", "NS-123.AWSDNS-45.ORG"],
     });
 
-    expect(result).toEqual([
+    expect(result?.nameserverMatches).toEqual([
       {
         nameserver: "adam.ns.cloudflare.com",
         providerId: "cloudflare",

@@ -87,12 +87,6 @@ function collectProviderMatches(options: {
   return matches;
 }
 
-function collectNameserverMatches(options: {
-  nameservers: readonly string[];
-}): readonly NameserverMatch[] {
-  return collectProviderMatches(options).map((match) => toNameserverMatch({ match }));
-}
-
 function resolveProviderMatches(options: {
   nameservers: readonly string[];
 }): ResolvedProviderMatches | undefined {
@@ -113,5 +107,5 @@ function matchProvider(options: { nameservers: readonly string[] }): ProviderMat
   return collectProviderMatches(options)[0];
 }
 
-export { collectNameserverMatches, matchProvider, resolveProviderMatches };
+export { matchProvider, resolveProviderMatches };
 export type { NameserverMatch, ProviderMatch, ResolvedProviderMatches };
