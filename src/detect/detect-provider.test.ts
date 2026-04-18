@@ -22,7 +22,7 @@ function createMockTransport(options: {
 }
 
 describe("detectProvider", () => {
-  it("detects a known provider", async () => {
+  it("detects a known provider with medium confidence for a single nameserver", async () => {
     const transport = createMockTransport({
       result: {
         status: "success",
@@ -35,10 +35,62 @@ describe("detectProvider", () => {
       transport,
     });
 
+    expect(result).toEqual({
+      status: "detected",
+      providerId: "cloudflare",
+      provider: expect.any(Object),
+      nameservers: ["adam.ns.cloudflare.com"],
+      detectionMethod: "nameserver-pattern",
+      confidence: "medium",
+      evidence: {
+        nameservers: ["adam.ns.cloudflare.com"],
+        matches: [
+          {
+            nameserver: "adam.ns.cloudflare.com",
+            providerId: "cloudflare",
+            matchedPattern: "*.ns.cloudflare.com",
+          },
+        ],
+      },
+    });
+  });
+
+  it("returns high confidence when every nameserver matches the same provider", async () => {
+    const transport = createMockTransport({
+      result: {
+        status: "success",
+        answers: [
+          { name: "example.com", type: 2, ttl: 300, data: "adam.ns.cloudflare.com" },
+          { name: "example.com", type: 2, ttl: 300, data: "beth.ns.cloudflare.com" },
+        ],
+      },
+    });
+
+    const result = await detectProvider({
+      domain: "example.com",
+      transport,
+    });
+
     expect(result).toMatchObject({
       status: "detected",
       providerId: "cloudflare",
-      matchedPattern: "*.ns.cloudflare.com",
+      detectionMethod: "nameserver-pattern",
+      confidence: "high",
+      evidence: {
+        nameservers: ["adam.ns.cloudflare.com", "beth.ns.cloudflare.com"],
+        matches: [
+          {
+            nameserver: "adam.ns.cloudflare.com",
+            providerId: "cloudflare",
+            matchedPattern: "*.ns.cloudflare.com",
+          },
+          {
+            nameserver: "beth.ns.cloudflare.com",
+            providerId: "cloudflare",
+            matchedPattern: "*.ns.cloudflare.com",
+          },
+        ],
+      },
     });
   });
 
@@ -78,6 +130,16 @@ describe("detectProvider", () => {
       status: "detected",
       providerId: "cloudflare",
       nameservers: ["adam.ns.cloudflare.com"],
+      evidence: {
+        nameservers: ["adam.ns.cloudflare.com"],
+        matches: [
+          {
+            nameserver: "adam.ns.cloudflare.com",
+            providerId: "cloudflare",
+            matchedPattern: "*.ns.cloudflare.com",
+          },
+        ],
+      },
     });
   });
 
@@ -98,6 +160,16 @@ describe("detectProvider", () => {
       status: "detected",
       providerId: "cloudflare",
       nameservers: ["adam.ns.cloudflare.com"],
+      evidence: {
+        nameservers: ["adam.ns.cloudflare.com"],
+        matches: [
+          {
+            nameserver: "adam.ns.cloudflare.com",
+            providerId: "cloudflare",
+            matchedPattern: "*.ns.cloudflare.com",
+          },
+        ],
+      },
     });
   });
 
@@ -115,7 +187,7 @@ describe("detectProvider", () => {
     expect(result).toEqual({ status: "lookup-failed", error });
   });
 
-  it("detects a provider when one of multiple nameservers matches", async () => {
+  it("returns medium confidence when one of multiple nameservers matches", async () => {
     const transport = createMockTransport({
       result: {
         status: "success",
@@ -134,6 +206,55 @@ describe("detectProvider", () => {
     expect(result).toMatchObject({
       status: "detected",
       providerId: "cloudflare",
+      confidence: "medium",
+      evidence: {
+        matches: [
+          {
+            nameserver: "adam.ns.cloudflare.com",
+            providerId: "cloudflare",
+            matchedPattern: "*.ns.cloudflare.com",
+          },
+        ],
+      },
+    });
+  });
+
+  it("returns low confidence when nameservers conflict across providers", async () => {
+    const transport = createMockTransport({
+      result: {
+        status: "success",
+        answers: [
+          { name: "example.com", type: 2, ttl: 300, data: "adam.ns.cloudflare.com" },
+          { name: "example.com", type: 2, ttl: 300, data: "ns-123.awsdns-45.org" },
+        ],
+      },
+    });
+
+    const result = await detectProvider({
+      domain: "example.com",
+      transport,
+    });
+
+    expect(result).toMatchObject({
+      status: "detected",
+      providerId: "cloudflare",
+      detectionMethod: "nameserver-pattern",
+      confidence: "low",
+      evidence: {
+        nameservers: ["adam.ns.cloudflare.com", "ns-123.awsdns-45.org"],
+        matches: [
+          {
+            nameserver: "adam.ns.cloudflare.com",
+            providerId: "cloudflare",
+            matchedPattern: "*.ns.cloudflare.com",
+          },
+          {
+            nameserver: "ns-123.awsdns-45.org",
+            providerId: "route53",
+            matchedPattern: "*.awsdns-*.org",
+          },
+        ],
+      },
     });
   });
 

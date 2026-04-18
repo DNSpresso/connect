@@ -1,11 +1,17 @@
 import { ConnectError } from "../connect-error";
-import { type DetectProviderResult } from "../detect/detect-provider";
+import {
+  type DetectProviderConfidence,
+  type DetectProviderMethod,
+  type DetectProviderResult,
+} from "../detect/detect-provider";
 import { type DnsRecord } from "../dns-record";
 import { assertDomainName, type DomainName } from "../domain-name";
-import { type ProviderId } from "../providers/provider-registry";
+import { type ProviderCapabilities, type ProviderId } from "../providers/provider-registry";
 
 const DEFAULT_TTL = 300;
 const DEFAULT_NOTES: readonly string[] = ["Changes may take time to propagate"];
+
+type GuidanceMode = "manual" | "domain-connect" | "api";
 
 type DnsRecordInstruction = {
   readonly record: DnsRecord;
@@ -15,11 +21,15 @@ type DnsRecordInstruction = {
 };
 
 type SetupGuidance = {
+  readonly mode: GuidanceMode;
   readonly provider:
     | {
         readonly status: "detected";
         readonly providerId: ProviderId;
         readonly name: string;
+        readonly capabilities: ProviderCapabilities;
+        readonly detectionMethod: DetectProviderMethod;
+        readonly confidence: DetectProviderConfidence;
       }
     | { readonly status: "unknown-provider" }
     | { readonly status: "lookup-failed"; readonly error: ConnectError };
@@ -55,6 +65,10 @@ function createRecordInstruction(options: {
   };
 }
 
+function resolveDnsSettingsUrl(options: { baseUrl?: string | undefined }): string | undefined {
+  return options.baseUrl;
+}
+
 function createSetupGuidance(options: {
   detection: DetectProviderResult;
   records: readonly DnsRecord[];
@@ -70,14 +84,20 @@ function createSetupGuidance(options: {
     }
 
     return {
+      mode: "manual",
       provider: {
         status: "detected",
         providerId: options.detection.providerId,
         name: options.detection.provider.name,
+        capabilities: options.detection.provider.capabilities,
+        detectionMethod: options.detection.detectionMethod,
+        confidence: options.detection.confidence,
       },
       records,
       links: {
-        dnsSettings: options.detection.provider.dnsSettingsUrl,
+        dnsSettings: resolveDnsSettingsUrl({
+          baseUrl: options.detection.provider.dnsSettings?.baseUrl,
+        }),
       },
       notes,
     };
@@ -85,6 +105,7 @@ function createSetupGuidance(options: {
 
   if (options.detection.status === "lookup-failed") {
     return {
+      mode: "manual",
       provider: {
         status: "lookup-failed",
         error: options.detection.error,
@@ -96,6 +117,7 @@ function createSetupGuidance(options: {
   }
 
   return {
+    mode: "manual",
     provider: { status: "unknown-provider" },
     records,
     links: {},
@@ -104,4 +126,4 @@ function createSetupGuidance(options: {
 }
 
 export { createSetupGuidance };
-export type { DnsRecordInstruction, SetupGuidance };
+export type { DnsRecordInstruction, GuidanceMode, SetupGuidance };

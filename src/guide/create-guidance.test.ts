@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import { ConnectError } from "../connect-error";
 import { createDnsRecord } from "../dns-record";
-import { PROVIDER_REGISTRY } from "../providers/provider-registry";
+import { type ProviderDefinition, PROVIDER_REGISTRY } from "../providers/provider-registry";
 import { createSetupGuidance } from "./create-guidance";
 
 const domain = "example.com";
 
 describe("createSetupGuidance", () => {
-  it("includes detected provider details for a root A record", () => {
+  it("includes manual mode and detected provider details for a root A record", () => {
     const record = createDnsRecord({
       type: "A",
       name: domain,
@@ -21,17 +21,36 @@ describe("createSetupGuidance", () => {
         providerId: "cloudflare",
         provider: PROVIDER_REGISTRY.cloudflare,
         nameservers: ["adam.ns.cloudflare.com"],
-        matchedPattern: "*.ns.cloudflare.com",
+        detectionMethod: "nameserver-pattern",
+        confidence: "medium",
+        evidence: {
+          nameservers: ["adam.ns.cloudflare.com"],
+          matches: [
+            {
+              nameserver: "adam.ns.cloudflare.com",
+              providerId: "cloudflare",
+              matchedPattern: "*.ns.cloudflare.com",
+            },
+          ],
+        },
       },
       records: [record],
       domain,
     });
 
     expect(guidance).toEqual({
+      mode: "manual",
       provider: {
         status: "detected",
         providerId: "cloudflare",
         name: "Cloudflare",
+        capabilities: {
+          manual: true,
+          domainConnect: "unsupported",
+          providerApi: "supported",
+        },
+        detectionMethod: "nameserver-pattern",
+        confidence: "medium",
       },
       records: [
         {
@@ -51,6 +70,67 @@ describe("createSetupGuidance", () => {
     });
   });
 
+  it("uses dnsSettings.baseUrl from structured provider metadata", () => {
+    const record = createDnsRecord({
+      type: "TXT",
+      name: domain,
+      value: "verification=token",
+    });
+    const provider: ProviderDefinition = {
+      name: "Structured DNS",
+      nameserverPatterns: ["*.structured.example"],
+      dnsSettings: {
+        baseUrl: "https://dns.example/settings",
+        deepLinkStrategy: "domain-path",
+      },
+      capabilities: {
+        manual: true,
+        domainConnect: "unknown",
+        providerApi: "unknown",
+      },
+    };
+
+    const guidance = createSetupGuidance({
+      detection: {
+        status: "detected",
+        providerId: "godaddy",
+        provider,
+        nameservers: ["ns1.structured.example"],
+        detectionMethod: "nameserver-pattern",
+        confidence: "medium",
+        evidence: {
+          nameservers: ["ns1.structured.example"],
+          matches: [
+            {
+              nameserver: "ns1.structured.example",
+              providerId: "godaddy",
+              matchedPattern: "*.structured.example",
+            },
+          ],
+        },
+      },
+      records: [record],
+      domain,
+    });
+
+    expect(guidance.mode).toBe("manual");
+    expect(guidance.provider).toEqual({
+      status: "detected",
+      providerId: "godaddy",
+      name: "Structured DNS",
+      capabilities: {
+        manual: true,
+        domainConnect: "unknown",
+        providerApi: "unknown",
+      },
+      detectionMethod: "nameserver-pattern",
+      confidence: "medium",
+    });
+    expect(guidance.links).toEqual({
+      dnsSettings: "https://dns.example/settings",
+    });
+  });
+
   it("strips the zone suffix for subdomain records", () => {
     const record = createDnsRecord({
       type: "CNAME",
@@ -64,16 +144,28 @@ describe("createSetupGuidance", () => {
         providerId: "cloudflare",
         provider: PROVIDER_REGISTRY.cloudflare,
         nameservers: ["adam.ns.cloudflare.com"],
-        matchedPattern: "*.ns.cloudflare.com",
+        detectionMethod: "nameserver-pattern",
+        confidence: "medium",
+        evidence: {
+          nameservers: ["adam.ns.cloudflare.com"],
+          matches: [
+            {
+              nameserver: "adam.ns.cloudflare.com",
+              providerId: "cloudflare",
+              matchedPattern: "*.ns.cloudflare.com",
+            },
+          ],
+        },
       },
       records: [record],
       domain,
     });
 
+    expect(guidance.mode).toBe("manual");
     expect(guidance.records[0]?.hostField).toBe("www");
   });
 
-  it("returns generic guidance for an unknown provider", () => {
+  it("returns generic manual guidance for an unknown provider", () => {
     const record = createDnsRecord({
       type: "TXT",
       name: domain,
@@ -89,6 +181,7 @@ describe("createSetupGuidance", () => {
       domain,
     });
 
+    expect(guidance.mode).toBe("manual");
     expect(guidance.provider).toEqual({ status: "unknown-provider" });
     expect(guidance.links).toEqual({});
     expect(guidance.records[0]?.ttlField).toBe(300);
@@ -111,6 +204,7 @@ describe("createSetupGuidance", () => {
       domain,
     });
 
+    expect(guidance.mode).toBe("manual");
     expect(guidance.provider).toEqual({ status: "lookup-failed", error });
   });
 

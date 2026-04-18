@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { matchProvider } from "./provider-match";
+import { collectNameserverMatches, matchProvider } from "./provider-match";
 
 describe("matchProvider", () => {
   it("matches Cloudflare nameservers", () => {
@@ -58,5 +58,61 @@ describe("matchProvider", () => {
 
     expect(result?.providerId).toBe("cloudflare");
     expect(result?.matchedPattern).not.toContain("awsdns");
+  });
+
+  it("includes structured provider capabilities in matched results", () => {
+    const result = matchProvider({ nameservers: ["adam.ns.cloudflare.com"] });
+
+    expect(result?.provider.capabilities).toEqual({
+      manual: true,
+      domainConnect: "unsupported",
+      providerApi: "supported",
+    });
+  });
+});
+
+describe("collectNameserverMatches", () => {
+  it("collects all nameserver matches in nameserver order", () => {
+    const result = collectNameserverMatches({
+      nameservers: ["ns1.custom-dns.example", "adam.ns.cloudflare.com", "ns-123.awsdns-45.org"],
+    });
+
+    expect(result).toEqual([
+      {
+        nameserver: "adam.ns.cloudflare.com",
+        providerId: "cloudflare",
+        matchedPattern: "*.ns.cloudflare.com",
+      },
+      {
+        nameserver: "ns-123.awsdns-45.org",
+        providerId: "route53",
+        matchedPattern: "*.awsdns-*.org",
+      },
+    ]);
+  });
+
+  it("returns an empty array when no nameservers match", () => {
+    const result = collectNameserverMatches({ nameservers: ["ns1.custom-dns.example"] });
+
+    expect(result).toEqual([]);
+  });
+
+  it("normalizes trailing dots and mixed case while collecting evidence", () => {
+    const result = collectNameserverMatches({
+      nameservers: ["Adam.NS.Cloudflare.COM.", "NS-123.AWSDNS-45.ORG"],
+    });
+
+    expect(result).toEqual([
+      {
+        nameserver: "adam.ns.cloudflare.com",
+        providerId: "cloudflare",
+        matchedPattern: "*.ns.cloudflare.com",
+      },
+      {
+        nameserver: "ns-123.awsdns-45.org",
+        providerId: "route53",
+        matchedPattern: "*.awsdns-*.org",
+      },
+    ]);
   });
 });

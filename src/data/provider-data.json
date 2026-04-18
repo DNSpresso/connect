@@ -2,7 +2,15 @@
   "cloudflare": {
     "name": "Cloudflare",
     "nameserverPatterns": ["*.ns.cloudflare.com"],
-    "dnsSettingsUrl": "https://dash.cloudflare.com/",
+    "dnsSettings": {
+      "baseUrl": "https://dash.cloudflare.com/",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "unsupported",
+      "providerApi": "supported"
+    },
     "notes": [
       "Disable Cloudflare proxy (orange cloud) for CNAME records used in domain verification."
     ]
@@ -10,12 +18,28 @@
   "godaddy": {
     "name": "GoDaddy",
     "nameserverPatterns": ["*.domaincontrol.com"],
-    "dnsSettingsUrl": "https://dcc.godaddy.com/manage/dns"
+    "dnsSettings": {
+      "baseUrl": "https://dcc.godaddy.com/manage/dns",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "supported",
+      "providerApi": "unknown"
+    }
   },
   "namecheap": {
     "name": "Namecheap",
     "nameserverPatterns": ["*.registrar-servers.com"],
-    "dnsSettingsUrl": "https://ap.www.namecheap.com/Domains/DomainControlPanel/",
+    "dnsSettings": {
+      "baseUrl": "https://ap.www.namecheap.com/Domains/DomainControlPanel/",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "unknown",
+      "providerApi": "unknown"
+    },
     "notes": ["Use '@' for the root domain in the Host field."]
   },
   "route53": {
@@ -26,11 +50,27 @@
       "*.awsdns-*.co.uk",
       "*.awsdns-*.org"
     ],
-    "dnsSettingsUrl": "https://console.aws.amazon.com/route53/"
+    "dnsSettings": {
+      "baseUrl": "https://console.aws.amazon.com/route53/",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "unsupported",
+      "providerApi": "supported"
+    }
   },
   "porkbun": {
     "name": "Porkbun",
     "nameserverPatterns": ["*.ns.porkbun.com"],
-    "dnsSettingsUrl": "https://porkbun.com/account/domains"
+    "dnsSettings": {
+      "baseUrl": "https://porkbun.com/account/domains",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "unknown",
+      "providerApi": "unknown"
+    }
   }
 }
