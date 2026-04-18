@@ -1,9 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 describe("@dnspresso/connect", () => {
-  it("loads the package entrypoint", async () => {
+  it("exports the expected runtime API", async () => {
     const loadedModule = await import("./index.js");
 
-    expect(Object.keys(loadedModule)).toEqual([]);
+    expect(Object.keys(loadedModule).toSorted()).toEqual([
+      "ConnectError",
+      "createDnsRecord",
+      "createDohTransport",
+      "createSetupGuidance",
+      "detectProvider",
+      "parseDomainName",
+      "watchPropagation",
+    ]);
   });
 });
