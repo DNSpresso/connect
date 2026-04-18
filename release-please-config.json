@@ -3,7 +3,10 @@
   "release-type": "node",
   "packages": {
     ".": {
-      "package-name": "@dnspresso/connect"
+      "package-name": "@dnspresso/connect",
+      "initial-version": "0.1.0",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
     }
   }
 }
