@@ -42,9 +42,10 @@
     "clean": "node --eval \"const { rmSync } = require('node:fs'); for (const path of ['dist', 'coverage']) rmSync(path, { recursive: true, force: true });\"",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
-    "lint": "oxlint src tsup.config.ts",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "lint": "oxlint src tests tsup.config.ts",
+    "test": "vitest run src",
+    "test:live": "RUN_LIVE_TESTS=1 vitest run tests/live",
+    "test:watch": "vitest src",
     "typecheck": "tsc --noEmit",
     "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test"
   },

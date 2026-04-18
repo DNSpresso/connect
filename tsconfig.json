@@ -17,5 +17,5 @@
     "ignoreDeprecations": "6.0",
     "types": ["node", "vitest/globals"]
   },
-  "include": ["src/**/*.ts", "tsup.config.ts"]
+  "include": ["src/**/*.ts", "tests/**/*.ts", "tsup.config.ts"]
 }
