@@ -194,9 +194,7 @@ async function* watchPropagation(options: {
         checks: pollPass.checks,
         elapsed,
       };
-    }
-
-    if (aggregateStatus !== "error") {
+    } else {
       yield {
         status: aggregateStatus,
         checks: pollPass.checks,
