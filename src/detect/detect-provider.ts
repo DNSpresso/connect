@@ -50,11 +50,7 @@ function getDetectionConfidence(options: {
     );
   });
 
-  if (
-    uniqueNameservers.length > 1 &&
-    everyNameserverMatchesOnlyDetectedProvider &&
-    !hasConflictingProviderMatches
-  ) {
+  if (uniqueNameservers.length > 1 && everyNameserverMatchesOnlyDetectedProvider) {
     return "high";
   }
 
