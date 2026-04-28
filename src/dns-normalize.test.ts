@@ -23,6 +23,14 @@ describe("normalizeTxtValue", () => {
     expect(normalizeTxtValue({ value: '"hello world"' })).toBe("hello world");
   });
 
+  it("normalizes an empty quoted value", () => {
+    expect(normalizeTxtValue({ value: '""' })).toBe("");
+  });
+
+  it("normalizes multiple empty quoted segments", () => {
+    expect(normalizeTxtValue({ value: '"" ""' })).toBe("");
+  });
+
   it("joins multiple quoted segments without spaces", () => {
     expect(normalizeTxtValue({ value: '"hello" "world"' })).toBe("helloworld");
   });
