@@ -10,8 +10,20 @@ export type { ConnectErrorCode } from "./connect-error";
 export type { DnsRecord, DnsRecordType, Hostname, Ipv4Address, Ipv6Address } from "./dns-record";
 export type { DnsAnswer, DnsQueryResult, DnsQueryTransport, DnsQueryType } from "./dns-transport";
 export type { DomainName, ParseDomainNameResult } from "./domain-name";
-export type { DetectProviderResult } from "./detect/detect-provider";
-export type { DnsRecordInstruction, SetupGuidance } from "./guide/create-guidance";
-export type { ProviderDefinition, ProviderId } from "./providers/provider-registry";
-export type { ProviderMatch } from "./providers/provider-match";
+export type {
+  DetectProviderConfidence,
+  DetectProviderEvidence,
+  DetectProviderMethod,
+  DetectProviderResult,
+} from "./detect/detect-provider";
+export type { DnsRecordInstruction, GuidanceMode, SetupGuidance } from "./guide/create-guidance";
+export type {
+  ProviderCapabilities,
+  ProviderCapabilitySupport,
+  ProviderDeepLinkStrategy,
+  ProviderDefinition,
+  ProviderDnsSettings,
+  ProviderId,
+} from "./providers/provider-registry";
+export type { NameserverMatch, ProviderMatch } from "./providers/provider-match";
 export type { PropagationCheck, WatchPropagationResult } from "./watch/watch-propagation";
