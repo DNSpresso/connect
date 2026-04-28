@@ -5,6 +5,7 @@ function normalizeDnsHostname(options: { value: string }): string {
 function normalizeTxtValue(options: { value: string }): string {
   let result = "";
   let inQuotes = false;
+  let foundQuotedSegment = false;
   let i = 0;
 
   while (i < options.value.length) {
@@ -20,6 +21,9 @@ function normalizeTxtValue(options: { value: string }): string {
     }
 
     if (char === '"') {
+      if (!inQuotes) {
+        foundQuotedSegment = true;
+      }
       inQuotes = !inQuotes;
       i += 1;
       continue;
@@ -32,11 +36,7 @@ function normalizeTxtValue(options: { value: string }): string {
     i += 1;
   }
 
-  if (result === "" && !inQuotes) {
-    return options.value;
-  }
-
-  return result;
+  return foundQuotedSegment ? result : options.value;
 }
 
 export { normalizeDnsHostname, normalizeTxtValue };
