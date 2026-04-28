@@ -2,15 +2,13 @@ import { z } from "zod";
 
 import { ConnectError } from "./connect-error";
 import { type DomainName, parseDomainName } from "./domain-name";
+import { normalizeIpv6Address, type Ipv6Address } from "./ipv6-address";
 
 const DNS_RECORD_TYPES = ["A", "AAAA", "CNAME", "TXT"] as const;
 const ttlSchema = z.int().positive();
 const ipv4AddressSchema = z.ipv4();
-const ipv6AddressSchema = z.ipv6();
-
 type DnsRecordType = (typeof DNS_RECORD_TYPES)[number];
 type Ipv4Address = string & { readonly __brand: "Ipv4Address" };
-type Ipv6Address = string & { readonly __brand: "Ipv6Address" };
 type Hostname = string & { readonly __brand: "Hostname" };
 
 type DnsRecord =
@@ -77,7 +75,9 @@ function assertValidTtl(options: { ttl?: number | undefined }): void {
 
   const result = ttlSchema.safeParse(ttl);
   if (!result.success) {
-    throw createInvalidDnsRecordError({ reason: `Invalid DNS record TTL: ${ttl}` });
+    throw createInvalidDnsRecordError({
+      reason: `Invalid DNS record TTL: ${ttl}`,
+    });
   }
 }
 
@@ -88,20 +88,6 @@ function normalizeIpv4Address(options: { value: string }): Ipv4Address | undefin
   }
 
   return result.data as Ipv4Address;
-}
-
-function normalizeIpv6Address(options: { value: string }): Ipv6Address | undefined {
-  const result = ipv6AddressSchema.safeParse(options.value);
-  if (!result.success) {
-    return undefined;
-  }
-
-  try {
-    const parsed = new URL(`http://[${result.data}]/`);
-    return parsed.hostname.slice(1, -1) as Ipv6Address;
-  } catch {
-    return undefined;
-  }
 }
 
 function parseHostname(options: { value: string }): Hostname | undefined {
@@ -209,5 +195,5 @@ function createDnsRecord(options: CreateDnsRecordOptions): DnsRecord {
   };
 }
 
-export { createDnsRecord, normalizeIpv6Address };
+export { createDnsRecord };
 export type { DnsRecord, DnsRecordType, Hostname, Ipv4Address, Ipv6Address };

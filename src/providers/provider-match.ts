@@ -10,6 +10,25 @@ type ProviderMatch = {
   readonly matchedNameserver: string;
 };
 
+type NameserverMatch = {
+  readonly nameserver: string;
+  readonly providerId: ProviderId;
+  readonly matchedPattern: string;
+};
+
+type ResolvedProviderMatches = {
+  readonly primaryMatch: ProviderMatch;
+  readonly nameserverMatches: readonly NameserverMatch[];
+};
+
+function toNameserverMatch(options: { match: ProviderMatch }): NameserverMatch {
+  return {
+    nameserver: options.match.matchedNameserver,
+    providerId: options.match.providerId,
+    matchedPattern: options.match.matchedPattern,
+  };
+}
+
 function getGlobRegex(options: { pattern: string }): RegExp {
   const cached = globRegexCache.get(options.pattern);
   if (cached !== undefined) {
@@ -37,7 +56,9 @@ function getGlobRegex(options: { pattern: string }): RegExp {
   return regex;
 }
 
-function matchProvider(options: { nameservers: readonly string[] }): ProviderMatch | undefined {
+function collectProviderMatches(options: {
+  nameservers: readonly string[];
+}): readonly ProviderMatch[] {
   const normalizedNameservers = options.nameservers.map((nameserver) =>
     normalizeDnsHostname({ value: nameserver }),
   );
@@ -46,23 +67,46 @@ function matchProvider(options: { nameservers: readonly string[] }): ProviderMat
     ProviderDefinition,
   ][];
 
+  const matches: ProviderMatch[] = [];
+
   for (const nameserver of normalizedNameservers) {
     for (const [providerId, provider] of providers) {
       for (const pattern of provider.nameserverPatterns) {
         if (getGlobRegex({ pattern }).test(nameserver)) {
-          return {
+          matches.push({
             providerId,
             provider,
             matchedPattern: pattern,
             matchedNameserver: nameserver,
-          };
+          });
+          break;
         }
       }
     }
   }
 
-  return undefined;
+  return matches;
 }
 
-export { matchProvider };
-export type { ProviderMatch };
+function resolveProviderMatches(options: {
+  nameservers: readonly string[];
+}): ResolvedProviderMatches | undefined {
+  const providerMatches = collectProviderMatches(options);
+  const primaryMatch = providerMatches[0];
+
+  if (primaryMatch === undefined) {
+    return undefined;
+  }
+
+  return {
+    primaryMatch,
+    nameserverMatches: providerMatches.map((match) => toNameserverMatch({ match })),
+  };
+}
+
+function matchProvider(options: { nameservers: readonly string[] }): ProviderMatch | undefined {
+  return collectProviderMatches(options)[0];
+}
+
+export { matchProvider, resolveProviderMatches };
+export type { NameserverMatch, ProviderMatch, ResolvedProviderMatches };
