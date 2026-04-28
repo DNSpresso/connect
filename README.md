@@ -1,6 +1,6 @@
 # @dnspresso/connect
 
-`@dnspresso/connect` is a headless TypeScript SDK for DNS onboarding flows.
+The open source toolkit for DNS onboarding.
 
 It helps applications:
 
@@ -58,6 +58,15 @@ const guidance = createSetupGuidance({
   domain,
 });
 
+if (detection.status === "detected") {
+  // Use detection.provider, detection.confidence, and detection.evidence
+  // to drive your onboarding UI.
+}
+
+if (guidance.mode === "manual") {
+  // Render guidance.records, guidance.links, and guidance.notes.
+}
+
 for await (const result of watchPropagation({ domain, records })) {
   if (result.status === "propagated") {
     break;
@@ -84,6 +93,13 @@ Returns one of:
 - `detected`
 - `unknown-provider`
 - `lookup-failed`
+
+Detected results now include structured detection metadata:
+
+- `detectionMethod`
+- `confidence`
+- `evidence.nameservers`
+- `evidence.matches`
 
 ### `createDnsRecord`
 
@@ -118,7 +134,10 @@ const guidance = createSetupGuidance({
 
 The output includes:
 
+- `mode` for the guidance flow
 - detected provider metadata when available
+- provider capabilities for future setup paths
+- detection metadata (`detectionMethod` and `confidence`) when a provider was detected
 - a DNS settings link when known
 - normalized record instructions
 - generic and provider-specific notes
