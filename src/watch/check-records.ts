@@ -1,7 +1,8 @@
 import { type ConnectError } from "../connect-error";
 import { normalizeDnsHostname, normalizeTxtValue } from "../dns-normalize";
 import { type DnsQueryResult } from "../dns-transport";
-import { normalizeIpv6Address, type DnsRecord } from "../dns-record";
+import { type DnsRecord } from "../dns-record";
+import { normalizeIpv6Address } from "../ipv6-address";
 
 type RecordCheckStatus = "found" | "not-found" | "error";
 
