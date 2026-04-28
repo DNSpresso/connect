@@ -79,6 +79,7 @@ function collectProviderMatches(options: {
             matchedPattern: pattern,
             matchedNameserver: nameserver,
           });
+          break;
         }
       }
     }
