@@ -2,8 +2,16 @@ import { ConnectError } from "../connect-error";
 import { normalizeDnsHostname } from "../dns-normalize";
 import { createDohTransport, type DnsQueryTransport } from "../dns-transport";
 import { assertDomainName } from "../domain-name";
-import { matchProvider } from "../providers/provider-match";
+import { resolveProviderMatches, type NameserverMatch } from "../providers/provider-match";
 import { type ProviderDefinition, type ProviderId } from "../providers/provider-registry";
+
+type DetectProviderMethod = "nameserver-pattern" | "domain-connect";
+type DetectProviderConfidence = "high" | "medium" | "low";
+
+type DetectProviderEvidence = {
+  readonly nameservers: readonly string[];
+  readonly matches: readonly NameserverMatch[];
+};
 
 type DetectProviderResult =
   | {
@@ -11,7 +19,9 @@ type DetectProviderResult =
       readonly providerId: ProviderId;
       readonly provider: ProviderDefinition;
       readonly nameservers: readonly string[];
-      readonly matchedPattern: string;
+      readonly detectionMethod: DetectProviderMethod;
+      readonly confidence: DetectProviderConfidence;
+      readonly evidence: DetectProviderEvidence;
     }
   | {
       readonly status: "unknown-provider";
@@ -21,6 +31,35 @@ type DetectProviderResult =
       readonly status: "lookup-failed";
       readonly error: ConnectError;
     };
+
+function getDetectionConfidence(options: {
+  nameservers: readonly string[];
+  providerId: ProviderId;
+  matches: readonly NameserverMatch[];
+}): DetectProviderConfidence {
+  const uniqueNameservers = [...new Set(options.nameservers)];
+  const hasConflictingProviderMatches = options.matches.some(
+    (match) => match.providerId !== options.providerId,
+  );
+
+  const everyNameserverMatchesOnlyDetectedProvider = uniqueNameservers.every((nameserver) => {
+    const nameserverMatches = options.matches.filter((match) => match.nameserver === nameserver);
+    return (
+      nameserverMatches.length > 0 &&
+      nameserverMatches.every((match) => match.providerId === options.providerId)
+    );
+  });
+
+  if (uniqueNameservers.length > 1 && everyNameserverMatchesOnlyDetectedProvider) {
+    return "high";
+  }
+
+  if (!hasConflictingProviderMatches) {
+    return "medium";
+  }
+
+  return "low";
+}
 
 async function detectProvider(options: {
   domain: string;
@@ -49,9 +88,9 @@ async function detectProvider(options: {
   const nameservers = lookupResult.answers.map((answer) =>
     normalizeDnsHostname({ value: answer.data }),
   );
-  const match = matchProvider({ nameservers });
+  const resolvedProviderMatches = resolveProviderMatches({ nameservers });
 
-  if (match === undefined) {
+  if (resolvedProviderMatches === undefined) {
     return {
       status: "unknown-provider",
       nameservers,
@@ -60,12 +99,26 @@ async function detectProvider(options: {
 
   return {
     status: "detected",
-    providerId: match.providerId,
-    provider: match.provider,
+    providerId: resolvedProviderMatches.primaryMatch.providerId,
+    provider: resolvedProviderMatches.primaryMatch.provider,
     nameservers,
-    matchedPattern: match.matchedPattern,
+    detectionMethod: "nameserver-pattern",
+    confidence: getDetectionConfidence({
+      nameservers,
+      providerId: resolvedProviderMatches.primaryMatch.providerId,
+      matches: resolvedProviderMatches.nameserverMatches,
+    }),
+    evidence: {
+      nameservers,
+      matches: resolvedProviderMatches.nameserverMatches,
+    },
   };
 }
 
 export { detectProvider };
-export type { DetectProviderResult };
+export type {
+  DetectProviderConfidence,
+  DetectProviderEvidence,
+  DetectProviderMethod,
+  DetectProviderResult,
+};
