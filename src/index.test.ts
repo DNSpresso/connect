@@ -9,8 +9,11 @@ describe("@dnspresso/connect", () => {
       "HOST_FIELD_STRATEGIES",
       "createDnsRecord",
       "createDohTransport",
+      "createOAuthTokenExchangeTransport",
+      "createProviderOAuthAuthorizationUrl",
       "createSetupGuidance",
       "detectProvider",
+      "exchangeProviderOAuthCode",
       "parseDomainName",
       "watchPropagation",
     ]);

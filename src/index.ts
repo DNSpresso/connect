@@ -6,6 +6,11 @@ export { detectProvider } from "./detect/detect-provider";
 export { createSetupGuidance } from "./guide/create-guidance";
 export { watchPropagation } from "./watch/watch-propagation";
 export { HOST_FIELD_STRATEGIES } from "./providers/provider-registry";
+export { createOAuthTokenExchangeTransport } from "./oauth/oauth-token-exchange";
+export {
+  createProviderOAuthAuthorizationUrl,
+  exchangeProviderOAuthCode,
+} from "./oauth/provider-oauth";
 
 export type { ConnectErrorCode } from "./connect-error";
 export type { DnsRecord, DnsRecordType, Hostname, Ipv4Address, Ipv6Address } from "./dns-record";
@@ -26,6 +31,23 @@ export type {
   ProviderDefinition,
   ProviderDnsSettings,
   ProviderId,
+  ProviderOAuthConfig,
 } from "./providers/provider-registry";
 export type { NameserverMatch, ProviderMatch } from "./providers/provider-match";
 export type { PropagationCheck, WatchPropagationResult } from "./watch/watch-propagation";
+export type {
+  OAuthTokenExchangeRequest,
+  OAuthTokenExchangeResponse,
+  OAuthTokenExchangeTransport,
+  OAuthTokenExchangeTransportOptions,
+} from "./oauth/oauth-token-exchange";
+export type {
+  OAuthClientAuthentication,
+  ProviderOAuthAuthorizationUrlOptions,
+  ProviderOAuthAuthorizationUrlResult,
+  ProviderOAuthPkceChallenge,
+  ProviderOAuthPkceVerifier,
+  ProviderOAuthTokenExchangeOptions,
+  ProviderOAuthTokenResult,
+  ProviderOAuthTokens,
+} from "./oauth/provider-oauth";
