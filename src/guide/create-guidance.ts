@@ -34,6 +34,7 @@ type SetupGuidance = {
         readonly capabilities: ProviderCapabilities;
         readonly detectionMethod: DetectProviderMethod;
         readonly confidence: DetectProviderConfidence;
+        readonly hostFieldStrategy: HostFieldStrategy;
       }
     | { readonly status: "unknown-provider" }
     | { readonly status: "lookup-failed"; readonly error: ConnectError };
@@ -124,6 +125,7 @@ function createSetupGuidance(options: {
         capabilities: options.detection.provider.capabilities,
         detectionMethod: options.detection.detectionMethod,
         confidence: options.detection.confidence,
+        hostFieldStrategy: options.detection.provider.hostFieldStrategy,
       },
       records,
       links: {

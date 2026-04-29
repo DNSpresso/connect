@@ -51,6 +51,7 @@ describe("createSetupGuidance", () => {
         },
         detectionMethod: "nameserver-pattern",
         confidence: "medium",
+        hostFieldStrategy: "at-symbol",
       },
       records: [
         {
@@ -126,6 +127,7 @@ describe("createSetupGuidance", () => {
       },
       detectionMethod: "nameserver-pattern",
       confidence: "medium",
+      hostFieldStrategy: "at-symbol",
     });
     expect(guidance.links).toEqual({
       dnsSettings: "https://dns.example/settings",
