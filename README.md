@@ -176,3 +176,24 @@ const parsed = parseDomainName({ value: "Example.com" });
 ```
 
 The main SDK functions validate their string inputs internally, so this helper is not required for the normal flow.
+
+## OAuth handshake foundation
+
+The SDK exposes a typed, headless OAuth 2.0 handshake foundation: build a provider authorization URL, then exchange the returned authorization code for tokens. The transport is injectable. Tokens are returned to the caller; the SDK keeps no state. No specific provider's OAuth metadata ships in this release — `provider.oauth` is `undefined` for every entry. Provider integrations land in subsequent versions.
+
+```ts
+import { createProviderOAuthAuthorizationUrl, exchangeProviderOAuthCode } from "@dnspresso/connect";
+
+// This currently returns provider-not-configured for cloudflare
+// until the follow-up provider metadata plan lands.
+const authUrl = createProviderOAuthAuthorizationUrl({
+  providerId: "cloudflare",
+  clientId: "your-client-id",
+  redirectUri: "https://app.example.com/callback",
+  state: "random-state",
+});
+
+if (authUrl.status === "success") {
+  // Redirect the user to authUrl.url
+}
+```

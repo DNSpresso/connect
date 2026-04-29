@@ -17,12 +17,20 @@ const providerCapabilitiesSchema = z.object({
   domainConnect: providerCapabilitySupportSchema,
   providerApi: providerCapabilitySupportSchema,
 });
+const providerOAuthConfigSchema = z.object({
+  authorizationUrl: z.url(),
+  tokenUrl: z.url(),
+  defaultScopes: z.array(z.string().min(1)),
+  supportsPkce: z.boolean(),
+});
+
 const providerDefinitionSchema = z.object({
   name: z.string().min(1),
   nameserverPatterns: z.array(z.string().min(1)).min(1),
   dnsSettings: providerDnsSettingsSchema.optional(),
   capabilities: providerCapabilitiesSchema,
   hostFieldStrategy: hostFieldStrategySchema,
+  oauth: providerOAuthConfigSchema.optional(),
   notes: z.array(z.string().min(1)).optional(),
 });
 const providerRegistrySchema = z.record(z.string(), providerDefinitionSchema);
@@ -42,12 +50,20 @@ type ProviderDnsSettings = {
   readonly deepLinkStrategy: ProviderDeepLinkStrategy;
 };
 
+type ProviderOAuthConfig = {
+  readonly authorizationUrl: string;
+  readonly tokenUrl: string;
+  readonly defaultScopes: readonly string[];
+  readonly supportsPkce: boolean;
+};
+
 type ProviderDefinition = {
   readonly name: string;
   readonly nameserverPatterns: readonly string[];
   readonly dnsSettings?: ProviderDnsSettings | undefined;
   readonly capabilities: ProviderCapabilities;
   readonly hostFieldStrategy: HostFieldStrategy;
+  readonly oauth?: ProviderOAuthConfig | undefined;
   readonly notes?: readonly string[] | undefined;
 };
 type ProviderId = keyof typeof rawProviderRegistry;
@@ -73,6 +89,15 @@ function toReadonlyProviderDefinition(options: {
       providerApi: options.provider.capabilities.providerApi,
     }),
     hostFieldStrategy: options.provider.hostFieldStrategy,
+    oauth:
+      options.provider.oauth === undefined
+        ? undefined
+        : Object.freeze({
+            authorizationUrl: options.provider.oauth.authorizationUrl,
+            tokenUrl: options.provider.oauth.tokenUrl,
+            defaultScopes: Object.freeze([...options.provider.oauth.defaultScopes]),
+            supportsPkce: options.provider.oauth.supportsPkce,
+          }),
     notes:
       options.provider.notes === undefined ? undefined : Object.freeze([...options.provider.notes]),
   });
@@ -96,4 +121,5 @@ export type {
   ProviderDefinition,
   ProviderDnsSettings,
   ProviderId,
+  ProviderOAuthConfig,
 };
