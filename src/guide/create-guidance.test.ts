@@ -166,6 +166,39 @@ describe("createSetupGuidance", () => {
     expect(guidance.records[0]?.hostField).toBe("www");
   });
 
+  it("returns a blank host field for OVH apex records", () => {
+    const record = createDnsRecord({
+      type: "TXT",
+      name: domain,
+      value: "verification=token",
+    });
+
+    const guidance = createSetupGuidance({
+      detection: {
+        status: "detected",
+        providerId: "ovh",
+        provider: PROVIDER_REGISTRY.ovh,
+        nameservers: ["dns19.ovh.net"],
+        detectionMethod: "nameserver-pattern",
+        confidence: "medium",
+        evidence: {
+          nameservers: ["dns19.ovh.net"],
+          matches: [
+            {
+              nameserver: "dns19.ovh.net",
+              providerId: "ovh",
+              matchedPattern: "*.ovh.net",
+            },
+          ],
+        },
+      },
+      records: [record],
+      domain,
+    });
+
+    expect(guidance.records[0]?.hostField).toBe("");
+  });
+
   it("returns generic manual guidance for an unknown provider", () => {
     const record = createDnsRecord({
       type: "TXT",

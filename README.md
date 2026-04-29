@@ -17,6 +17,13 @@ The SDK is designed for products that need users to complete manual DNS setup fo
 - Namecheap
 - Amazon Route 53
 - Porkbun
+- OVHcloud
+- Hetzner
+- IONOS
+- Squarespace Domains
+- Google Cloud DNS
+- Gandi
+- DigitalOcean
 
 Provider data lives in `src/data/provider-data.json`
 
