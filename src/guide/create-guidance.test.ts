@@ -51,6 +51,7 @@ describe("createSetupGuidance", () => {
         },
         detectionMethod: "nameserver-pattern",
         confidence: "medium",
+        hostFieldStrategy: "at-symbol",
       },
       records: [
         {
@@ -88,6 +89,7 @@ describe("createSetupGuidance", () => {
         domainConnect: "unknown",
         providerApi: "unknown",
       },
+      hostFieldStrategy: "at-symbol",
     };
 
     const guidance = createSetupGuidance({
@@ -125,6 +127,7 @@ describe("createSetupGuidance", () => {
       },
       detectionMethod: "nameserver-pattern",
       confidence: "medium",
+      hostFieldStrategy: "at-symbol",
     });
     expect(guidance.links).toEqual({
       dnsSettings: "https://dns.example/settings",
@@ -163,6 +166,39 @@ describe("createSetupGuidance", () => {
 
     expect(guidance.mode).toBe("manual");
     expect(guidance.records[0]?.hostField).toBe("www");
+  });
+
+  it("returns a blank host field for OVH apex records", () => {
+    const record = createDnsRecord({
+      type: "TXT",
+      name: domain,
+      value: "verification=token",
+    });
+
+    const guidance = createSetupGuidance({
+      detection: {
+        status: "detected",
+        providerId: "ovh",
+        provider: PROVIDER_REGISTRY.ovh,
+        nameservers: ["dns19.ovh.net"],
+        detectionMethod: "nameserver-pattern",
+        confidence: "medium",
+        evidence: {
+          nameservers: ["dns19.ovh.net"],
+          matches: [
+            {
+              nameserver: "dns19.ovh.net",
+              providerId: "ovh",
+              matchedPattern: "*.ovh.net",
+            },
+          ],
+        },
+      },
+      records: [record],
+      domain,
+    });
+
+    expect(guidance.records[0]?.hostField).toBe("");
   });
 
   it("returns generic manual guidance for an unknown provider", () => {
@@ -245,5 +281,134 @@ describe("createSetupGuidance", () => {
     });
 
     expect(guidance.records[0]?.hostField).toBe("otherexample.com");
+  });
+
+  it("returns a blank host field for apex records when strategy is blank", () => {
+    const record = createDnsRecord({
+      type: "TXT",
+      name: domain,
+      value: "verification=token",
+    });
+    const provider: ProviderDefinition = {
+      name: "Blank Strategy DNS",
+      nameserverPatterns: ["*.blank.example"],
+      capabilities: {
+        manual: true,
+        domainConnect: "unknown",
+        providerApi: "unknown",
+      },
+      hostFieldStrategy: "blank",
+    };
+
+    const guidance = createSetupGuidance({
+      detection: {
+        status: "detected",
+        providerId: "cloudflare",
+        provider,
+        nameservers: ["ns1.blank.example"],
+        detectionMethod: "nameserver-pattern",
+        confidence: "medium",
+        evidence: {
+          nameservers: ["ns1.blank.example"],
+          matches: [
+            {
+              nameserver: "ns1.blank.example",
+              providerId: "cloudflare",
+              matchedPattern: "*.blank.example",
+            },
+          ],
+        },
+      },
+      records: [record],
+      domain,
+    });
+
+    expect(guidance.records[0]?.hostField).toBe("");
+  });
+
+  it("returns the full domain for apex records when strategy is full-domain", () => {
+    const record = createDnsRecord({
+      type: "TXT",
+      name: domain,
+      value: "verification=token",
+    });
+    const provider: ProviderDefinition = {
+      name: "Full Domain Strategy DNS",
+      nameserverPatterns: ["*.full.example"],
+      capabilities: {
+        manual: true,
+        domainConnect: "unknown",
+        providerApi: "unknown",
+      },
+      hostFieldStrategy: "full-domain",
+    };
+
+    const guidance = createSetupGuidance({
+      detection: {
+        status: "detected",
+        providerId: "cloudflare",
+        provider,
+        nameservers: ["ns1.full.example"],
+        detectionMethod: "nameserver-pattern",
+        confidence: "medium",
+        evidence: {
+          nameservers: ["ns1.full.example"],
+          matches: [
+            {
+              nameserver: "ns1.full.example",
+              providerId: "cloudflare",
+              matchedPattern: "*.full.example",
+            },
+          ],
+        },
+      },
+      records: [record],
+      domain,
+    });
+
+    expect(guidance.records[0]?.hostField).toBe("example.com");
+  });
+
+  it("returns the full record name for subdomain records when strategy is full-domain", () => {
+    const record = createDnsRecord({
+      type: "CNAME",
+      name: "www.example.com",
+      value: "target.example.net",
+    });
+    const provider: ProviderDefinition = {
+      name: "Full Domain Strategy DNS",
+      nameserverPatterns: ["*.full.example"],
+      capabilities: {
+        manual: true,
+        domainConnect: "unknown",
+        providerApi: "unknown",
+      },
+      hostFieldStrategy: "full-domain",
+    };
+
+    const guidance = createSetupGuidance({
+      detection: {
+        status: "detected",
+        providerId: "cloudflare",
+        provider,
+        nameservers: ["ns1.full.example"],
+        detectionMethod: "nameserver-pattern",
+        confidence: "medium",
+        evidence: {
+          nameservers: ["ns1.full.example"],
+          matches: [
+            {
+              nameserver: "ns1.full.example",
+              providerId: "cloudflare",
+              matchedPattern: "*.full.example",
+            },
+          ],
+        },
+      },
+      records: [record],
+      domain,
+    });
+
+    expect(guidance.records[0]?.hostField).toBe("www.example.com");
   });
 });

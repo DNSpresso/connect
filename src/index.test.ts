@@ -6,6 +6,7 @@ describe("@dnspresso/connect", () => {
 
     expect(Object.keys(loadedModule).toSorted()).toEqual([
       "ConnectError",
+      "HOST_FIELD_STRATEGIES",
       "createDnsRecord",
       "createDohTransport",
       "createSetupGuidance",

@@ -6,6 +6,8 @@ const PROVIDER_CAPABILITY_SUPPORT = ["supported", "unsupported", "unknown"] as c
 const providerCapabilitySupportSchema = z.enum(PROVIDER_CAPABILITY_SUPPORT);
 const PROVIDER_DEEP_LINK_STRATEGIES = ["none", "domain-path", "zone-id"] as const;
 const providerDeepLinkStrategySchema = z.enum(PROVIDER_DEEP_LINK_STRATEGIES);
+const HOST_FIELD_STRATEGIES = ["at-symbol", "blank", "full-domain"] as const;
+const hostFieldStrategySchema = z.enum(HOST_FIELD_STRATEGIES);
 const providerDnsSettingsSchema = z.object({
   baseUrl: z.url(),
   deepLinkStrategy: providerDeepLinkStrategySchema,
@@ -20,12 +22,14 @@ const providerDefinitionSchema = z.object({
   nameserverPatterns: z.array(z.string().min(1)).min(1),
   dnsSettings: providerDnsSettingsSchema.optional(),
   capabilities: providerCapabilitiesSchema,
+  hostFieldStrategy: hostFieldStrategySchema,
   notes: z.array(z.string().min(1)).optional(),
 });
 const providerRegistrySchema = z.record(z.string(), providerDefinitionSchema);
 
 type ProviderCapabilitySupport = (typeof PROVIDER_CAPABILITY_SUPPORT)[number];
 type ProviderDeepLinkStrategy = (typeof PROVIDER_DEEP_LINK_STRATEGIES)[number];
+type HostFieldStrategy = (typeof HOST_FIELD_STRATEGIES)[number];
 
 type ProviderCapabilities = {
   readonly manual: true;
@@ -43,6 +47,7 @@ type ProviderDefinition = {
   readonly nameserverPatterns: readonly string[];
   readonly dnsSettings?: ProviderDnsSettings | undefined;
   readonly capabilities: ProviderCapabilities;
+  readonly hostFieldStrategy: HostFieldStrategy;
   readonly notes?: readonly string[] | undefined;
 };
 type ProviderId = keyof typeof rawProviderRegistry;
@@ -67,6 +72,7 @@ function toReadonlyProviderDefinition(options: {
       domainConnect: options.provider.capabilities.domainConnect,
       providerApi: options.provider.capabilities.providerApi,
     }),
+    hostFieldStrategy: options.provider.hostFieldStrategy,
     notes:
       options.provider.notes === undefined ? undefined : Object.freeze([...options.provider.notes]),
   });
@@ -81,8 +87,9 @@ const PROVIDER_REGISTRY = Object.freeze(
   Object.fromEntries(providerRegistryEntries),
 ) as ProviderRegistry;
 
-export { PROVIDER_REGISTRY };
+export { HOST_FIELD_STRATEGIES, PROVIDER_REGISTRY };
 export type {
+  HostFieldStrategy,
   ProviderCapabilities,
   ProviderCapabilitySupport,
   ProviderDeepLinkStrategy,

@@ -33,6 +33,56 @@ describe("matchProvider", () => {
     expect(result?.providerId).toBe("porkbun");
   });
 
+  it("matches OVH nameservers", () => {
+    const result = matchProvider({ nameservers: ["dns19.ovh.net"] });
+
+    expect(result?.providerId).toBe("ovh");
+    expect(result?.matchedPattern).toBe("*.ovh.net");
+  });
+
+  it("matches Hetzner nameservers", () => {
+    const result = matchProvider({ nameservers: ["hydrogen.ns.hetzner.com"] });
+
+    expect(result?.providerId).toBe("hetzner");
+  });
+
+  it("matches IONOS nameservers", () => {
+    const result = matchProvider({ nameservers: ["ns-1and1.ui-dns.com"] });
+
+    expect(result?.providerId).toBe("ionos");
+  });
+
+  it("matches Squarespace nameservers", () => {
+    const result = matchProvider({ nameservers: ["ns01.squarespacedns.com"] });
+
+    expect(result?.providerId).toBe("squarespace");
+  });
+
+  it("matches legacy Google Domains / Cloud DNS nameservers", () => {
+    const result = matchProvider({ nameservers: ["ns-cloud-a1.googledomains.com"] });
+
+    expect(result?.providerId).toBe("google");
+  });
+
+  it("matches Gandi nameservers", () => {
+    const result = matchProvider({ nameservers: ["ns-177-a.gandi.net"] });
+
+    expect(result?.providerId).toBe("gandi");
+  });
+
+  it("matches DigitalOcean nameservers", () => {
+    const result = matchProvider({ nameservers: ["ns1.digitalocean.com"] });
+
+    expect(result?.providerId).toBe("digitalocean");
+  });
+
+  it("does not collide between OVH and other globs", () => {
+    const result = matchProvider({ nameservers: ["dns19.ovh.net"] });
+
+    expect(result?.providerId).toBe("ovh");
+    expect(result?.matchedPattern).not.toContain("anycast");
+  });
+
   it("returns undefined for unknown nameservers", () => {
     const result = matchProvider({ nameservers: ["ns1.custom-dns.example"] });
 

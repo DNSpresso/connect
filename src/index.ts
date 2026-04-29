@@ -5,6 +5,7 @@ export { parseDomainName } from "./domain-name";
 export { detectProvider } from "./detect/detect-provider";
 export { createSetupGuidance } from "./guide/create-guidance";
 export { watchPropagation } from "./watch/watch-propagation";
+export { HOST_FIELD_STRATEGIES } from "./providers/provider-registry";
 
 export type { ConnectErrorCode } from "./connect-error";
 export type { DnsRecord, DnsRecordType, Hostname, Ipv4Address, Ipv6Address } from "./dns-record";
@@ -18,6 +19,7 @@ export type {
 } from "./detect/detect-provider";
 export type { DnsRecordInstruction, GuidanceMode, SetupGuidance } from "./guide/create-guidance";
 export type {
+  HostFieldStrategy,
   ProviderCapabilities,
   ProviderCapabilitySupport,
   ProviderDeepLinkStrategy,

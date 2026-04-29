@@ -11,6 +11,7 @@
       "domainConnect": "unknown",
       "providerApi": "unknown"
     },
+    "hostFieldStrategy": "at-symbol",
     "notes": [
       "Disable Cloudflare proxy (orange cloud) for CNAME records used in domain verification."
     ]
@@ -26,7 +27,8 @@
       "manual": true,
       "domainConnect": "unknown",
       "providerApi": "unknown"
-    }
+    },
+    "hostFieldStrategy": "at-symbol"
   },
   "namecheap": {
     "name": "Namecheap",
@@ -40,6 +42,7 @@
       "domainConnect": "unknown",
       "providerApi": "unknown"
     },
+    "hostFieldStrategy": "at-symbol",
     "notes": ["Use '@' for the root domain in the Host field."]
   },
   "route53": {
@@ -58,7 +61,8 @@
       "manual": true,
       "domainConnect": "unknown",
       "providerApi": "unknown"
-    }
+    },
+    "hostFieldStrategy": "at-symbol"
   },
   "porkbun": {
     "name": "Porkbun",
@@ -71,6 +75,117 @@
       "manual": true,
       "domainConnect": "unknown",
       "providerApi": "unknown"
-    }
+    },
+    "hostFieldStrategy": "at-symbol"
+  },
+  "ovh": {
+    "name": "OVHcloud",
+    "nameserverPatterns": ["*.ovh.net", "*.anycast.me"],
+    "dnsSettings": {
+      "baseUrl": "https://www.ovh.com/manager/",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "unknown",
+      "providerApi": "unknown"
+    },
+    "hostFieldStrategy": "blank",
+    "notes": [
+      "Leave the Sub-domain field blank for root records. OVH does not accept @ at the apex."
+    ]
+  },
+  "hetzner": {
+    "name": "Hetzner",
+    "nameserverPatterns": ["*.ns.hetzner.de", "*.ns.hetzner.com", "*.ns.hetzner.cloud"],
+    "dnsSettings": {
+      "baseUrl": "https://dns.hetzner.com/",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "unknown",
+      "providerApi": "unknown"
+    },
+    "hostFieldStrategy": "at-symbol"
+  },
+  "ionos": {
+    "name": "IONOS",
+    "nameserverPatterns": ["*.ui-dns.com", "*.ui-dns.de", "*.ui-dns.org", "*.ui-dns.biz"],
+    "dnsSettings": {
+      "baseUrl": "https://my.ionos.com/domains",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "unknown",
+      "providerApi": "unknown"
+    },
+    "hostFieldStrategy": "at-symbol"
+  },
+  "squarespace": {
+    "name": "Squarespace Domains",
+    "nameserverPatterns": ["ns*.squarespacedns.com"],
+    "dnsSettings": {
+      "baseUrl": "https://account.squarespace.com/domains",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "unknown",
+      "providerApi": "unknown"
+    },
+    "hostFieldStrategy": "at-symbol",
+    "notes": [
+      "Domains migrated from Google Domains may still use ns-cloud-*.googledomains.com nameservers."
+    ]
+  },
+  "google": {
+    "name": "Google Cloud DNS",
+    "nameserverPatterns": ["ns-cloud-*.googledomains.com"],
+    "dnsSettings": {
+      "baseUrl": "https://console.cloud.google.com/net-services/dns/zones",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "unknown",
+      "providerApi": "unknown"
+    },
+    "hostFieldStrategy": "at-symbol",
+    "notes": [
+      "Includes domains migrated from Google Domains; manage records in the Cloud DNS console."
+    ]
+  },
+  "gandi": {
+    "name": "Gandi",
+    "nameserverPatterns": ["ns-*.gandi.net"],
+    "dnsSettings": {
+      "baseUrl": "https://admin.gandi.net/domain",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "unknown",
+      "providerApi": "unknown"
+    },
+    "hostFieldStrategy": "at-symbol"
+  },
+  "digitalocean": {
+    "name": "DigitalOcean",
+    "nameserverPatterns": ["ns1.digitalocean.com", "ns2.digitalocean.com", "ns3.digitalocean.com"],
+    "dnsSettings": {
+      "baseUrl": "https://cloud.digitalocean.com/networking/domains",
+      "deepLinkStrategy": "none"
+    },
+    "capabilities": {
+      "manual": true,
+      "domainConnect": "unknown",
+      "providerApi": "unknown"
+    },
+    "hostFieldStrategy": "at-symbol",
+    "notes": [
+      "DigitalOcean is a managed DNS provider, not a registrar. Delegate your domain to use it."
+    ]
   }
 }
