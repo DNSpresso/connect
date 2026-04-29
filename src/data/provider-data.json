@@ -11,6 +11,7 @@
       "domainConnect": "unknown",
       "providerApi": "unknown"
     },
+    "hostFieldStrategy": "at-symbol",
     "notes": [
       "Disable Cloudflare proxy (orange cloud) for CNAME records used in domain verification."
     ]
@@ -26,7 +27,8 @@
       "manual": true,
       "domainConnect": "unknown",
       "providerApi": "unknown"
-    }
+    },
+    "hostFieldStrategy": "at-symbol"
   },
   "namecheap": {
     "name": "Namecheap",
@@ -40,6 +42,7 @@
       "domainConnect": "unknown",
       "providerApi": "unknown"
     },
+    "hostFieldStrategy": "at-symbol",
     "notes": ["Use '@' for the root domain in the Host field."]
   },
   "route53": {
@@ -58,7 +61,8 @@
       "manual": true,
       "domainConnect": "unknown",
       "providerApi": "unknown"
-    }
+    },
+    "hostFieldStrategy": "at-symbol"
   },
   "porkbun": {
     "name": "Porkbun",
@@ -71,6 +75,7 @@
       "manual": true,
       "domainConnect": "unknown",
       "providerApi": "unknown"
-    }
+    },
+    "hostFieldStrategy": "at-symbol"
   }
 }

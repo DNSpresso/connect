@@ -6,7 +6,11 @@ import {
 } from "../detect/detect-provider";
 import { type DnsRecord } from "../dns-record";
 import { assertDomainName, type DomainName } from "../domain-name";
-import { type ProviderCapabilities, type ProviderId } from "../providers/provider-registry";
+import {
+  type HostFieldStrategy,
+  type ProviderCapabilities,
+  type ProviderId,
+} from "../providers/provider-registry";
 
 const DEFAULT_TTL = 300;
 const DEFAULT_NOTES: readonly string[] = ["Changes may take time to propagate"];
@@ -40,9 +44,30 @@ type SetupGuidance = {
   readonly notes: readonly string[];
 };
 
-function getHostField(options: { recordName: DomainName; domain: DomainName }): string {
-  if (options.recordName === options.domain) {
-    return "@";
+function getHostField(options: {
+  recordName: DomainName;
+  domain: DomainName;
+  strategy: HostFieldStrategy;
+}): string {
+  const isRoot = options.recordName === options.domain;
+
+  if (isRoot) {
+    switch (options.strategy) {
+      case "at-symbol":
+        return "@";
+      case "blank":
+        return "";
+      case "full-domain":
+        return options.domain;
+      default: {
+        const _exhaustive: never = options.strategy;
+        return _exhaustive;
+      }
+    }
+  }
+
+  if (options.strategy === "full-domain") {
+    return options.recordName;
   }
 
   const suffix = `.${options.domain}`;
@@ -56,10 +81,15 @@ function getHostField(options: { recordName: DomainName; domain: DomainName }): 
 function createRecordInstruction(options: {
   record: DnsRecord;
   domain: DomainName;
+  strategy: HostFieldStrategy;
 }): DnsRecordInstruction {
   return {
     record: options.record,
-    hostField: getHostField({ recordName: options.record.name, domain: options.domain }),
+    hostField: getHostField({
+      recordName: options.record.name,
+      domain: options.domain,
+      strategy: options.strategy,
+    }),
     valueField: options.record.value,
     ttlField: options.record.ttl ?? DEFAULT_TTL,
   };
@@ -71,7 +101,13 @@ function createSetupGuidance(options: {
   domain: string;
 }): SetupGuidance {
   const domain = assertDomainName({ value: options.domain });
-  const records = options.records.map((record) => createRecordInstruction({ record, domain }));
+  const strategy: HostFieldStrategy =
+    options.detection.status === "detected"
+      ? options.detection.provider.hostFieldStrategy
+      : "at-symbol";
+  const records = options.records.map((record) =>
+    createRecordInstruction({ record, domain, strategy }),
+  );
   const notes = [...DEFAULT_NOTES];
 
   if (options.detection.status === "detected") {
